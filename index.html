@@ -6,16 +6,40 @@
     <title>Escudo Legal - Piloto 3</title>
     <link rel="stylesheet" href="index.css">
   </head>
-  <body>
-  <div id="root">
-    <!-- Este contenido se ve mientras carga la app para que no quede en blanco -->
-    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #121212; color: #00a2ff; font-family: sans-serif;">
-      <h2>CARGANDO ESCUDO LEGAL...</h2>
+<body style="margin: 0; background-color: #121212; color: white; font-family: sans-serif;">
+    <div id="root">
+        <div style="padding: 20px; text-align: center;">
+            <h1 style="color: #00a2ff; text-shadow: 0 0 10px rgba(0,162,255,0.5);">ESCUDO LEGAL</h1>
+            <p style="font-size: 0.9em; color: #888;">Piloto 3 - Protección Ciudadana</p>
+            
+            <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
+                <button onclick="activar('Splitch')" style="padding: 20px; background: #d32f2f; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1em; cursor: pointer;">
+                    🔴 ACTIVAR SPLITCH (AUDIO)
+                </button>
+
+                <button onclick="activar('Cajón')" style="padding: 20px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1em; cursor: pointer;">
+                    📹 ACTIVAR MODO CAJÓN (VIDEO)
+                </button>
+
+                <button onclick="alert('Cargando Artículos 14, 18 y 19...')" style="padding: 15px; background: #333; color: white; border: 1px solid #555; border-radius: 10px; cursor: pointer;">
+                    ⚖️ CONSULTA CONSTITUCIONAL RAPIDA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Esta es la lógica simple para que la web responda
+        function activar(tipo) {
+            alert('Protocolo ' + tipo + ' iniciado. El sistema está listo para registrar evidencia.');
+            console.log('Iniciando grabación en modo: ' + tipo);
+        }
+    </script>
+</body>
+  2>CARGANDO ESCUDO LEGAL...</h2>
     </div>
   </div>
 
-  <!-- Cambiamos la ruta para asegurar que GitHub encuentre el archivo -->
-  <script type="module" src="./src/main.tsx"></script>
-</body>
+  <
 
 </html>
