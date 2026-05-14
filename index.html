@@ -1,192 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Escudo Legal - Piloto 3</title>
-    <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --primary-blue: #00a2ff;
-            --danger-red: #d32f2f;
-            --card-bg: #1a1a1a;
-            --text-gray: #b0b0b0;
-        }
-
-        body {
-            margin: 0;
-            background-color: var(--bg-color);
-            color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            text-align: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #333;
-            margin-bottom: 25px;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--primary-blue);
-            letter-spacing: 2px;
-            margin: 0;
-            text-shadow: 0 0 15px rgba(0, 162, 255, 0.3);
-        }
-
-        .version-tag {
-            font-size: 0.7rem;
-            background: #333;
-            padding: 3px 8px;
-            border-radius: 4px;
-            vertical-align: middle;
-            color: var(--text-gray);
-        }
-
-        .protocol-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 22px;
-            border: none;
-            border-radius: 14px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn:active { transform: scale(0.98); }
-
-        .btn-splitch {
-            background: linear-gradient(135deg, #b71c1c, #f44336);
-            color: white;
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
-        }
-
-        .btn-cajon {
-            background: linear-gradient(135deg, #0d47a1, #2196f3);
-            color: white;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-        }
-
-        .legal-card {
-            background-color: var(--card-bg);
-            border: 1px solid #333;
-            border-radius: 16px;
-            padding: 20px;
-        }
-
-        .legal-card h3 {
-            margin-top: 0;
-            color: var(--primary-blue);
-            font-size: 1rem;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-
-        .law-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .law-item:last-child { border-bottom: none; }
-
-        .law-title {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #efefef;
-            margin-bottom: 4px;
-        }
-
-        .law-desc {
-            font-size: 0.8rem;
-            color: var(--text-gray);
-            line-height: 1.4;
-        }
-
-        .status-bar {
-            margin-top: auto;
-            text-align: center;
-            font-size: 0.75rem;
-            color: #00ff00;
-            padding-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="app-container">
-        <header>
-            <h1 class="logo">ESCUDO LEGAL <span class="version-tag">V3.0</span></h1>
-            <p style="color: var(--text-gray); font-size: 0.85rem; margin-top: 5px;">Protección Ciudadana en Tiempo Real</p>
-        </header>
-
-        <div class="protocol-section">
-            <button class="btn btn-splitch" onclick="activarModoFantasma('Splitch')">
-                🔴 ACTIVAR SPLITCH
-            </button>
-            <button class="btn btn-cajon" onclick="activarModoFantasma('Cajón')">
-                📹 MODO CAJÓN
-            </button>
+    <link rel="stylesheet" href="./src/index.css">
+  </head>
+  <body>
+    <div id="root">
+      <div style="background-color: #000; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: sans-serif;">
+        <h1 style="color: #00a2ff; letter-spacing: 5px; margin-bottom: 10px;">ESCUDO LEGAL</h1>
+        <div style="color: white; font-size: 1.2rem;">
+          Cargando<span id="dots">...</span>
         </div>
-
-        <div class="legal-card">
-            <h3>Legislación Argentina - Defensa</h3>
-            <div class="law-item">
-                <span class="law-title">Constitución Nacional - Art. 18</span>
-                <span class="law-desc">Inviolabilidad de la defensa en juicio. Nadie puede ser obligado a declarar contra sí mismo.</span>
-            </div>
-            <div class="law-item">
-                <span class="law-title">Constitución Nacional - Art. 19</span>
-                <span class="law-desc">Las acciones privadas de los hombres que de ningún modo ofendan al orden público, están reservadas a Dios.</span>
-            </div>
-        </div>
-
-        <div class="status-bar">
-            ● SISTEMA ACTIVO Y PROTEGIENDO
-        </div>
+      </div>
     </div>
 
-    <script>
-        // Lógica del sistema Escudo Legal
-        function activarModoFantasma(comando) {
-            // Simulación de activación sigilosa
-            console.log("Comando recibido: " + comando);
-            
-            if (comando === "Splitch") {
-                alert("Protocolo SPLITCH: Iniciando grabación de audio sigilosa...");
-            } else if (comando === "Cajón") {
-                alert("Modo CAJÓN: Iniciando grabación de video en segundo plano...");
-            } else {
-                alert("Comando no reconocido.");
-            }
-        }
+    <script type="module" src="./src/main.tsx"></script>
 
-        // Simulación de ubicación por GPS
-        console.log("Obteniendo legislación para ubicación: Argentina");
+    <script>
+      // Animación de los puntitos mientras el navegador intenta levantar el TSX
+      let dots = 0;
+      setInterval(() => {
+        dots = (dots + 1) % 4;
+        document.getElementById('dots').innerText = '.'.repeat(dots);
+      }, 500);
     </script>
-</body>
+  </body>
 </html>
