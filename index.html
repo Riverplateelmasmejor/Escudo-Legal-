@@ -7,10 +7,15 @@
     <link rel="stylesheet" href="index.css">
   </head>
   <body>
-    <!-- Aquí es donde React montará la aplicación -->
-    <div id="root"></div>
+  <div id="root">
+    <!-- Este contenido se ve mientras carga la app para que no quede en blanco -->
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #121212; color: #00a2ff; font-family: sans-serif;">
+      <h2>CARGANDO ESCUDO LEGAL...</h2>
+    </div>
+  </div>
 
-    <!-- Vinculación a tu archivo principal -->
-    <script type="module" src="main.tsx"></script>
-  </body>
+  <!-- Cambiamos la ruta para asegurar que GitHub encuentre el archivo -->
+  <script type="module" src="./src/main.tsx"></script>
+</body>
+
 </html>
