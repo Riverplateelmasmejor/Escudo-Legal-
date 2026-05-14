@@ -1,31 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Escudo Legal - Piloto 3</title>
-    <link rel="stylesheet" href="./src/index.css">
-  </head>
-  <body>
-    <div id="root">
-      <div style="background-color: #000; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: sans-serif;">
-        <h1 style="color: #00a2ff; letter-spacing: 5px; margin-bottom: 10px;">ESCUDO LEGAL</h1>
-        <div style="color: white; font-size: 1.2rem;">
-          Cargando<span id="dots">...</span>
-        </div>
-      </div>
+    <style>
+        body { margin: 0; background-color: #000; color: #00a2ff; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        #loading-screen { text-align: center; }
+        .dots::after { content: ''; animation: dots 1.5s infinite; }
+        @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
+        
+        #app-interface { display: none; width: 100%; max-width: 400px; padding: 20px; flex-direction: column; align-items: center; }
+        .pin-display { background: #111; border: 2px solid #00a2ff; width: 80%; height: 50px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; letter-spacing: 5px; color: white; }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+        .num-btn { background: #1a1a1a; border: 1px solid #333; color: white; padding: 20px; font-size: 1.2rem; border-radius: 10px; cursor: pointer; }
+        .num-btn:active { background: #00a2ff; color: black; }
+        .header { text-align: center; margin-bottom: 20px; width: 100%; }
+        .status-light { display: inline-block; width: 10px; height: 10px; background: #00ff00; border-radius: 50%; margin-right: 5px; box-shadow: 0 0 10px #00ff00; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <h1 style="letter-spacing: 8px;">ESCUDO LEGAL</h1>
+        <p style="color: white;">INICIANDO SISTEMA SEGURIZADO<span class="dots"></span></p>
     </div>
 
-    <script type="module" src="./src/main.tsx"></script>
+    <div id="app-interface">
+        <div class="header">
+            <h2 style="margin: 0; font-size: 1.2rem;">SISTEMA DE CONTROL</h2>
+            <p style="font-size: 0.7rem; color: #555;"><span class="status-bar"><span class="status-light"></span> CONEXIÓN ENCRIPTADA</span></p>
+        </div>
+
+        <div class="pin-display" id="display">****</div>
+
+        <div class="numpad">
+            <button class="num-btn" onclick="press('1')">1</button>
+            <button class="num-btn" onclick="press('2')">2</button>
+            <button class="num-btn" onclick="press('3')">3</button>
+            <button class="num-btn" onclick="press('4')">4</button>
+            <button class="num-btn" onclick="press('5')">5</button>
+            <button class="num-btn" onclick="press('6')">6</button>
+            <button class="num-btn" onclick="press('7')">7</button>
+            <button class="num-btn" onclick="press('8')">8</button>
+            <button class="num-btn" onclick="press('9')">9</button>
+            <button class="num-btn" onclick="clearPin()">C</button>
+            <button class="num-btn" onclick="press('0')">0</button>
+            <button class="num-btn" style="background: #00a2ff; color: black; font-weight: bold;" onclick="enter()">OK</button>
+        </div>
+        
+        <p style="margin-top: 20px; font-size: 0.8rem; color: #444;">INGRESE CÓDIGO DE PROTOCOLO</p>
+    </div>
 
     <script>
-      // Animación de los puntitos mientras el navegador intenta levantar el TSX
-      let dots = 0;
-      setInterval(() => {
-        dots = (dots + 1) % 4;
-        document.getElementById('dots').innerText = '.'.repeat(dots);
-      }, 500);
+        // Simulación de los 10 segundos de espera
+        setTimeout(() => {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('app-interface').style.display = 'flex';
+        }, 10000);
+
+        let currentPin = "";
+        function press(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                document.getElementById('display').innerText = "*".repeat(currentPin.length);
+            }
+        }
+
+        function clearPin() {
+            currentPin = "";
+            document.getElementById('display').innerText = "****";
+        }
+
+        function enter() {
+            if (currentPin === "1234") { // Ejemplo de código
+                alert("PROTOCOLOS ACTIVADOS: SPLITCH / CAJÓN LISTOS");
+            } else {
+                alert("CÓDIGO INVÁLIDO");
+                clearPin();
+            }
+        }
     </script>
-  </body>
+</body>
 </html>
