@@ -5,36 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Escudo Legal - Piloto 3</title>
     <style>
-        body { margin: 0; background-color: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 400px; padding: 20px; text-align: center; }
-        .header { color: #00a2ff; margin-bottom: 30px; }
-        .btn { width: 100%; padding: 20px; margin-bottom: 15px; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
-        .btn-red { background: linear-gradient(45deg, #b71c1c, #f44336); color: white; }
-        .btn-blue { background: linear-gradient(45deg, #0d47a1, #2196f3); color: white; }
-        .btn-grey { background: #333; color: #ccc; border: 1px solid #444; }
+        :root {
+            --bg-color: #0a0a0a;
+            --primary-blue: #00a2ff;
+            --danger-red: #d32f2f;
+            --card-bg: #1a1a1a;
+            --text-gray: #b0b0b0;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 0 0 15px rgba(0, 162, 255, 0.3);
+        }
+
+        .version-tag {
+            font-size: 0.7rem;
+            background: #333;
+            padding: 3px 8px;
+            border-radius: 4px;
+            vertical-align: middle;
+            color: var(--text-gray);
+        }
+
+        .protocol-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 22px;
+            border: none;
+            border-radius: 14px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:active { transform: scale(0.98); }
+
+        .btn-splitch {
+            background: linear-gradient(135deg, #b71c1c, #f44336);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-cajon {
+            background: linear-gradient(135deg, #0d47a1, #2196f3);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .legal-card {
+            background-color: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .legal-card h3 {
+            margin-top: 0;
+            color: var(--primary-blue);
+            font-size: 1rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .law-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .law-item:last-child { border-bottom: none; }
+
+        .law-title {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #efefef;
+            margin-bottom: 4px;
+        }
+
+        .law-desc {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            line-height: 1.4;
+        }
+
+        .status-bar {
+            margin-top: auto;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #00ff00;
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>ESCUDO LEGAL</h1>
-            <p>Piloto 3 - Protección Ciudadana</p>
-        </div>
+    <div class="app-container">
+        <header>
+            <h1 class="logo">ESCUDO LEGAL <span class="version-tag">V3.0</span></h1>
+            <p style="color: var(--text-gray); font-size: 0.85rem; margin-top: 5px;">Protección Ciudadana en Tiempo Real</p>
+        </header>
 
-        <button class="btn btn-red" onclick="alert('Protocolo SPLITCH: Grabando audio...')">
-            🔴 ACTIVAR SPLITCH
-        </button>
-
-        <button class="btn btn-blue" onclick="alert('Modo CAJÓN: Grabando video...')">
-            📹 MODO CAJÓN
-        </button>
-
-        <div style="margin-top: 20px; padding: 15px; background: #1e1e1e; border-radius: 10px;">
-            <p style="font-size: 0.8em; color: #888;">Base Legal Rápida</p>
-            <button class="btn btn-grey" style="padding: 10px; font-size: 0.9em;" onclick="alert('Art. 18: Inviolabilidad de la defensa en juicio.')">
-                ARTÍCULO 18
+        <div class="protocol-section">
+            <button class="btn btn-splitch" onclick="activarModoFantasma('Splitch')">
+                🔴 ACTIVAR SPLITCH
+            </button>
+            <button class="btn btn-cajon" onclick="activarModoFantasma('Cajón')">
+                📹 MODO CAJÓN
             </button>
         </div>
+
+        <div class="legal-card">
+            <h3>Legislación Argentina - Defensa</h3>
+            <div class="law-item">
+                <span class="law-title">Constitución Nacional - Art. 18</span>
+                <span class="law-desc">Inviolabilidad de la defensa en juicio. Nadie puede ser obligado a declarar contra sí mismo.</span>
+            </div>
+            <div class="law-item">
+                <span class="law-title">Constitución Nacional - Art. 19</span>
+                <span class="law-desc">Las acciones privadas de los hombres que de ningún modo ofendan al orden público, están reservadas a Dios.</span>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            ● SISTEMA ACTIVO Y PROTEGIENDO
+        </div>
     </div>
+
+    <script>
+        // Lógica del sistema Escudo Legal
+        function activarModoFantasma(comando) {
+            // Simulación de activación sigilosa
+            console.log("Comando recibido: " + comando);
+            
+            if (comando === "Splitch") {
+                alert("Protocolo SPLITCH: Iniciando grabación de audio sigilosa...");
+            } else if (comando === "Cajón") {
+                alert("Modo CAJÓN: Iniciando grabación de video en segundo plano...");
+            } else {
+                alert("Comando no reconocido.");
+            }
+        }
+
+        // Simulación de ubicación por GPS
+        console.log("Obteniendo legislación para ubicación: Argentina");
+    </script>
 </body>
 </html>
