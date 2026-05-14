@@ -1,45 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Escudo Legal - Piloto 3</title>
-    <link rel="stylesheet" href="index.css">
-  </head>
-<body style="margin: 0; background-color: #121212; color: white; font-family: sans-serif;">
-    <div id="root">
-        <div style="padding: 20px; text-align: center;">
-            <h1 style="color: #00a2ff; text-shadow: 0 0 10px rgba(0,162,255,0.5);">ESCUDO LEGAL</h1>
-            <p style="font-size: 0.9em; color: #888;">Piloto 3 - Protección Ciudadana</p>
-            
-            <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
-                <button onclick="activar('Splitch')" style="padding: 20px; background: #d32f2f; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1em; cursor: pointer;">
-                    🔴 ACTIVAR SPLITCH (AUDIO)
-                </button>
+    <style>
+        body { margin: 0; background-color: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 400px; padding: 20px; text-align: center; }
+        .header { color: #00a2ff; margin-bottom: 30px; }
+        .btn { width: 100%; padding: 20px; margin-bottom: 15px; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
+        .btn-red { background: linear-gradient(45deg, #b71c1c, #f44336); color: white; }
+        .btn-blue { background: linear-gradient(45deg, #0d47a1, #2196f3); color: white; }
+        .btn-grey { background: #333; color: #ccc; border: 1px solid #444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ESCUDO LEGAL</h1>
+            <p>Piloto 3 - Protección Ciudadana</p>
+        </div>
 
-                <button onclick="activar('Cajón')" style="padding: 20px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1em; cursor: pointer;">
-                    📹 ACTIVAR MODO CAJÓN (VIDEO)
-                </button>
+        <button class="btn btn-red" onclick="alert('Protocolo SPLITCH: Grabando audio...')">
+            🔴 ACTIVAR SPLITCH
+        </button>
 
-                <button onclick="alert('Cargando Artículos 14, 18 y 19...')" style="padding: 15px; background: #333; color: white; border: 1px solid #555; border-radius: 10px; cursor: pointer;">
-                    ⚖️ CONSULTA CONSTITUCIONAL RAPIDA
-                </button>
-            </div>
+        <button class="btn btn-blue" onclick="alert('Modo CAJÓN: Grabando video...')">
+            📹 MODO CAJÓN
+        </button>
+
+        <div style="margin-top: 20px; padding: 15px; background: #1e1e1e; border-radius: 10px;">
+            <p style="font-size: 0.8em; color: #888;">Base Legal Rápida</p>
+            <button class="btn btn-grey" style="padding: 10px; font-size: 0.9em;" onclick="alert('Art. 18: Inviolabilidad de la defensa en juicio.')">
+                ARTÍCULO 18
+            </button>
         </div>
     </div>
-
-    <script>
-        // Esta es la lógica simple para que la web responda
-        function activar(tipo) {
-            alert('Protocolo ' + tipo + ' iniciado. El sistema está listo para registrar evidencia.');
-            console.log('Iniciando grabación en modo: ' + tipo);
-        }
-    </script>
 </body>
-  2>CARGANDO ESCUDO LEGAL...</h2>
-    </div>
-  </div>
-
-  <
-
-</html
+</html>
