@@ -1,4 +1,4 @@
-import sqlite3
+ import sqlite3
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
@@ -13,7 +13,7 @@ try:
 except ImportError:
     tts = None
 
-# Colores Exactos de tus Capturas Reales
+# Paleta de colores "Escudo Legal"
 AZUL_PROFUNDO = (0.04, 0.06, 0.12, 1)   # Fondo de la App
 CIAN_ESCUDO = (0.0, 0.75, 0.85, 1)     # Bordes, títulos y botones activos
 GRIS_TARJETA = (0.1, 0.14, 0.22, 1)    # Contenedor de cada artículo
@@ -22,7 +22,7 @@ TEXTO_BLANCO = (0.95, 0.95, 0.95, 1)
 Window.clearcolor = AZUL_PROFUNDO
 
 class TarjetaArticulo(BoxLayout):
-    """ Tarjeta contenedora con la estética redondeada de tus fotos """
+    """ Tarjeta contenedora con estética redondeada """
     def __init__(self, fuente, articulo, contenido, callback_audio, **kwargs):
         super(TarjetaArticulo, self).__init__(**kwargs)
         self.orientation = 'horizontal'
@@ -31,7 +31,7 @@ class TarjetaArticulo(BoxLayout):
         self.padding = 12
         self.spacing = 10
         
-        # Dibujamos el fondo redondeado gris azulado de la tarjeta
+        # Fondo redondeado gris azulado de la tarjeta
         with self.canvas.before:
             Color(*GRIS_TARJETA)
             self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[12])
@@ -57,7 +57,7 @@ class TarjetaArticulo(BoxLayout):
         texto_layout.add_widget(cuerpo)
         self.add_widget(texto_layout)
         
-        # Bloque Derecho: Botón circular de Altoparlante 🔊
+        # Bloque Derecho: Botón de Altoparlante 🔊
         self.btn_audio = Button(
             text='🔊', font_size=20, size_hint_x=0.15,
             background_normal='', background_color=(0.15, 0.22, 0.32, 1),
@@ -77,7 +77,7 @@ class MenuAsistenciaLeyes(TabbedPanel):
         self.tab_pos = 'top_mid'
         self.tab_height = 50
         
-        # Las columnas exactas detectadas en tu desarrollo
+        # Categorías del desarrollo original
         self.categorias_reales = [
             {"titulo": "PENAL", "key": "Penal"},
             {"titulo": "CIVIL Y COM.", "key": "Civil"},
@@ -90,18 +90,32 @@ class MenuAsistenciaLeyes(TabbedPanel):
 
     def reproducir_altoparlante(self, texto):
         if tts:
-            try: tts.speak(text=texto)
-            except Exception as e: print(f"Error TTS: {e}")
+            try: 
+                tts.speak(text=texto)
+            except Exception as e: 
+                print(f"Error TTS: {e}")
         else:
             print(f"Simulando voz alta: {texto}")
 
     def cargar_interfaz_original(self):
+        # 1. Cargamos todos los datos en un solo viaje de conexión
+        datos_leyes = {}
         try:
             conexion = sqlite3.connect("escudo_legal.db")
             cursor = conexion.cursor()
-        except Exception:
-            cursor = None
+            
+            for cat in self.categorias_reales:
+                cursor.execute("SELECT fuente, articulo, contenido FROM leyes WHERE categoria LIKE ?", ('%' + cat["key"] + '%',))
+                datos_leyes[cat["key"]] = cursor.fetchall()
+                
+            conexion.close()
+        except Exception as e:
+            print(f"Aviso: No se pudo conectar a la DB ({e}). Usando modo ilustrativo.")
+            # Si falla, dejamos el diccionario vacío para que use los datos de respaldo
+            for cat in self.categorias_reales:
+                datos_leyes[cat["key"]] = []
 
+        # 2. Ahora sí, armamos la interfaz sin tocar el disco
         for cat in self.categorias_reales:
             pestaña = TabbedPanelItem(text=cat["titulo"])
             pestaña.background_normal = ''
@@ -114,17 +128,14 @@ class MenuAsistenciaLeyes(TabbedPanel):
             contenedor_lista = BoxLayout(orientation='vertical', size_hint_y=None, spacing=12, padding=12)
             contenedor_lista.bind(minimum_height=contenedor_lista.setter('height'))
             
-            # Consultamos la base de datos local
-            resultados = []
-            if cursor:
-                cursor.execute("SELECT fuente, articulo, contenido FROM leyes WHERE categoria LIKE ?", ('%' + cat["key"] + '%',))
-                resultados = cursor.fetchall()
+            # Traemos los resultados que ya están en memoria
+            resultados = datos_leyes.get(cat["key"], [])
             
-            # Si está vacío, inyectamos la estructura visual para mantener el diseño impecable
+            # Respaldo visual si no hay registros en esa categoría
             if not resultados:
                 resultados = [("Módulo Base", "Artículo Ilustrativo", f"Contenido legal cargado dentro de la sección {cat['titulo']}. Tocá el parlante derecho para validación por audio.")]
 
-            # Añadimos las tarjetas idénticas a tus imágenes
+            # Inyectamos las tarjetas en el contenedor
             for fuente, art, contenido in resultados:
                 tarjeta = TarjetaArticulo(
                     fuente=fuente, articulo=art, contenido=contenido,
@@ -135,9 +146,6 @@ class MenuAsistenciaLeyes(TabbedPanel):
             scroll.add_widget(contenedor_lista)
             pestaña.add_widget(scroll)
             self.add_widget(pestaña)
-
-        if conexion:
-            conexion.close()
 
 class EscudoLegalApp(App):
     def build(self):
