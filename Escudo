@@ -1,0 +1,148 @@
+import sqlite3
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.core.window import Window
+from kivy.graphics import Color, RoundedRectangle
+
+try:
+    from plyer import tts
+except ImportError:
+    tts = None
+
+# Colores Exactos de tus Capturas Reales
+AZUL_PROFUNDO = (0.04, 0.06, 0.12, 1)   # Fondo de la App
+CIAN_ESCUDO = (0.0, 0.75, 0.85, 1)     # Bordes, títulos y botones activos
+GRIS_TARJETA = (0.1, 0.14, 0.22, 1)    # Contenedor de cada artículo
+TEXTO_BLANCO = (0.95, 0.95, 0.95, 1)
+
+Window.clearcolor = AZUL_PROFUNDO
+
+class TarjetaArticulo(BoxLayout):
+    """ Tarjeta contenedora con la estética redondeada de tus fotos """
+    def __init__(self, fuente, articulo, contenido, callback_audio, **kwargs):
+        super(TarjetaArticulo, self).__init__(**kwargs)
+        self.orientation = 'horizontal'
+        self.size_hint_y = None
+        self.height = 130
+        self.padding = 12
+        self.spacing = 10
+        
+        # Dibujamos el fondo redondeado gris azulado de la tarjeta
+        with self.canvas.before:
+            Color(*GRIS_TARJETA)
+            self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[12])
+        self.bind(pos=self.actualizar_rect, size=self.actualizar_rect)
+        
+        # Bloque Izquierdo: Texto de la Ley
+        texto_layout = BoxLayout(orientation='vertical', size_hint_x=0.85)
+        
+        titulo = Label(
+            text=f"{fuente} - {articulo}",
+            bold=True, font_size=15, color=CIAN_ESCUDO,
+            size_hint_y=None, height=25, halign='left'
+        )
+        titulo.bind(size=titulo.setter('text_size'))
+        
+        cuerpo = Label(
+            text=contenido, font_size=13, color=TEXTO_BLANCO,
+            halign='left', valign='top'
+        )
+        cuerpo.bind(size=cuerpo.setter('text_size'))
+        
+        texto_layout.add_widget(titulo)
+        texto_layout.add_widget(cuerpo)
+        self.add_widget(texto_layout)
+        
+        # Bloque Derecho: Botón circular de Altoparlante 🔊
+        self.btn_audio = Button(
+            text='🔊', font_size=20, size_hint_x=0.15,
+            background_normal='', background_color=(0.15, 0.22, 0.32, 1),
+            color=CIAN_ESCUDO
+        )
+        self.btn_audio.bind(on_press=lambda inst: callback_audio(contenido))
+        self.add_widget(self.btn_audio)
+
+    def actualizar_rect(self, instance, value):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
+
+class MenuAsistenciaLeyes(TabbedPanel):
+    def __init__(self, **kwargs):
+        super(MenuAsistenciaLeyes, self).__init__(**kwargs)
+        self.do_default_tab = False
+        self.tab_pos = 'top_mid'
+        self.tab_height = 50
+        
+        # Las columnas exactas detectadas en tu desarrollo
+        self.categorias_reales = [
+            {"titulo": "PENAL", "key": "Penal"},
+            {"titulo": "CIVIL Y COM.", "key": "Civil"},
+            {"titulo": "FAMILIA Y MEN.", "key": "Menores"},
+            {"titulo": "CONSUMIDOR", "key": "Consumidor"},
+            {"titulo": "LABORAL", "key": "Laboral"}
+        ]
+        
+        self.cargar_interfaz_original()
+
+    def reproducir_altoparlante(self, texto):
+        if tts:
+            try: tts.speak(text=texto)
+            except Exception as e: print(f"Error TTS: {e}")
+        else:
+            print(f"Simulando voz alta: {texto}")
+
+    def cargar_interfaz_original(self):
+        try:
+            conexion = sqlite3.connect("escudo_legal.db")
+            cursor = conexion.cursor()
+        except Exception:
+            cursor = None
+
+        for cat in self.categorias_reales:
+            pestaña = TabbedPanelItem(text=cat["titulo"])
+            pestaña.background_normal = ''
+            pestaña.background_color = AZUL_PROFUNDO
+            pestaña.color = CIAN_ESCUDO
+            pestaña.font_size = 13
+            pestaña.font_bold = True
+            
+            scroll = ScrollView(size_hint=(1, 1))
+            contenedor_lista = BoxLayout(orientation='vertical', size_hint_y=None, spacing=12, padding=12)
+            contenedor_lista.bind(minimum_height=contenedor_lista.setter('height'))
+            
+            # Consultamos la base de datos local
+            resultados = []
+            if cursor:
+                cursor.execute("SELECT fuente, articulo, contenido FROM leyes WHERE categoria LIKE ?", ('%' + cat["key"] + '%',))
+                resultados = cursor.fetchall()
+            
+            # Si está vacío, inyectamos la estructura visual para mantener el diseño impecable
+            if not resultados:
+                resultados = [("Módulo Base", "Artículo Ilustrativo", f"Contenido legal cargado dentro de la sección {cat['titulo']}. Tocá el parlante derecho para validación por audio.")]
+
+            # Añadimos las tarjetas idénticas a tus imágenes
+            for fuente, art, contenido in resultados:
+                tarjeta = TarjetaArticulo(
+                    fuente=fuente, articulo=art, contenido=contenido,
+                    callback_audio=self.reproducir_altoparlante
+                )
+                contenedor_lista.add_widget(tarjeta)
+                
+            scroll.add_widget(contenedor_lista)
+            pestaña.add_widget(scroll)
+            self.add_widget(pestaña)
+
+        if conexion:
+            conexion.close()
+
+class EscudoLegalApp(App):
+    def build(self):
+        self.title = "Escudo Legal - Módulo Asistencia"
+        return MenuAsistenciaLeyes()
+
+if __name__ == '__main__':
+    EscudoLegalApp().run()
