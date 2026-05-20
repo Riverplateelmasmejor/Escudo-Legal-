@@ -1,156 +1,202 @@
- import sqlite3
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.core.window import Window
-from kivy.graphics import Color, RoundedRectangle
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escudo Legal - Módulo Asistencia</title>
+    <style>
+        /* Los colores exactos de tu diseño original */
+        :root {
+            --azul-profundo: #0a0f1f;
+            --cian-escudo: #00bfd8;
+            --gris-tarjeta: #1a2438;
+            --texto-blanco: #f2f2f2;
+            --azul-boton: #263852;
+        }
 
-try:
-    from plyer import tts
-except ImportError:
-    tts = None
+        body {
+            background-color: var(--azul-profundo);
+            color: var(--texto-blanco);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-# Paleta de colores "Escudo Legal"
-AZUL_PROFUNDO = (0.04, 0.06, 0.12, 1)   # Fondo de la App
-CIAN_ESCUDO = (0.0, 0.75, 0.85, 1)     # Bordes, títulos y botones activos
-GRIS_TARJETA = (0.1, 0.14, 0.22, 1)    # Contenedor de cada artículo
-TEXTO_BLANCO = (0.95, 0.95, 0.95, 1)
+        /* Barra de pestañas (Tabs) */
+        .tabs-container {
+            display: flex;
+            background-color: var(--azul-profundo);
+            border-bottom: 2px solid var(--gris-tarjeta);
+            overflow-x: auto;
+            sticky: top;
+        }
 
-Window.clearcolor = AZUL_PROFUNDO
+        .tab-button {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--texto-blanco);
+            padding: 15px 10px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
 
-class TarjetaArticulo(BoxLayout):
-    """ Tarjeta contenedora con estética redondeada """
-    def __init__(self, fuente, articulo, contenido, callback_audio, **kwargs):
-        super(TarjetaArticulo, self).__init__(**kwargs)
-        self.orientation = 'horizontal'
-        self.size_hint_y = None
-        self.height = 130
-        self.padding = 12
-        self.spacing = 10
-        
-        # Fondo redondeado gris azulado de la tarjeta
-        with self.canvas.before:
-            Color(*GRIS_TARJETA)
-            self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[12])
-        self.bind(pos=self.actualizar_rect, size=self.actualizar_rect)
-        
-        # Bloque Izquierdo: Texto de la Ley
-        texto_layout = BoxLayout(orientation='vertical', size_hint_x=0.85)
-        
-        titulo = Label(
-            text=f"{fuente} - {articulo}",
-            bold=True, font_size=15, color=CIAN_ESCUDO,
-            size_hint_y=None, height=25, halign='left'
-        )
-        titulo.bind(size=titulo.setter('text_size'))
-        
-        cuerpo = Label(
-            text=contenido, font_size=13, color=TEXTO_BLANCO,
-            halign='left', valign='top'
-        )
-        cuerpo.bind(size=cuerpo.setter('text_size'))
-        
-        texto_layout.add_widget(titulo)
-        texto_layout.add_widget(cuerpo)
-        self.add_widget(texto_layout)
-        
-        # Bloque Derecho: Botón de Altoparlante 🔊
-        self.btn_audio = Button(
-            text='🔊', font_size=20, size_hint_x=0.15,
-            background_normal='', background_color=(0.15, 0.22, 0.32, 1),
-            color=CIAN_ESCUDO
-        )
-        self.btn_audio.bind(on_press=lambda inst: callback_audio(contenido))
-        self.add_widget(self.btn_audio)
+        .tab-button.active {
+            color: var(--cian-escudo);
+            border-bottom: 3px solid var(--cian-escudo);
+        }
 
-    def actualizar_rect(self, instance, value):
-        self.rect.pos = self.pos
-        self.rect.size = self.size
+        /* Contenedor de las tarjetas de leyes */
+        .content-container {
+            padding: 12px;
+            display: none;
+        }
 
-class MenuAsistenciaLeyes(TabbedPanel):
-    def __init__(self, **kwargs):
-        super(MenuAsistenciaLeyes, self).__init__(**kwargs)
-        self.do_default_tab = False
-        self.tab_pos = 'top_mid'
-        self.tab_height = 50
-        
-        # Categorías del desarrollo original
-        self.categorias_reales = [
-            {"titulo": "PENAL", "key": "Penal"},
-            {"titulo": "CIVIL Y COM.", "key": "Civil"},
-            {"titulo": "FAMILIA Y MEN.", "key": "Menores"},
-            {"titulo": "CONSUMIDOR", "key": "Consumidor"},
-            {"titulo": "LABORAL", "key": "Laboral"}
-        ]
-        
-        self.cargar_interfaz_original()
+        .content-container.active {
+            display: block;
+        }
 
-    def reproducir_altoparlante(self, texto):
-        if tts:
-            try: 
-                tts.speak(text=texto)
-            except Exception as e: 
-                print(f"Error TTS: {e}")
-        else:
-            print(f"Simulando voz alta: {texto}")
+        /* Tarjeta idéntica a tus capturas */
+        .tarjeta-articulo {
+            background-color: var(--gris-tarjeta);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100px;
+        }
 
-    def cargar_interfaz_original(self):
-        # 1. Cargamos todos los datos en un solo viaje de conexión
-        datos_leyes = {}
-        try:
-            conexion = sqlite3.connect("escudo_legal.db")
-            cursor = conexion.cursor()
+        .texto-ley {
+            width: 82%;
+        }
+
+        .titulo-ley {
+            color: var(--cian-escudo);
+            font-size: 15px;
+            font-weight: bold;
+            margin: 0 0 5px 0;
+        }
+
+        .cuerpo-ley {
+            font-size: 13px;
+            margin: 0;
+            color: var(--texto-blanco);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Botón de altoparlante circular/cuadrado activo */
+        .btn-audio {
+            width: 15%;
+            height: 50px;
+            background-color: var(--azul-boton);
+            border: none;
+            border-radius: 8px;
+            color: var(--cian-escudo);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-audio:active {
+            background-color: var(--cian-escudo);
+            color: var(--azul-profundo);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tabs-container">
+        <button class="tab-button active" onclick="cambiarPestaña('penal')">PENAL</button>
+        <button class="tab-button" onclick="cambiarPestaña('civil')">CIVIL Y COM.</button>
+        <button class="tab-button" onclick="cambiarPestaña('familia')">FAMILIA Y MEN.</button>
+        <button class="tab-button" onclick="cambiarPestaña('consumidor')">CONSUMIDOR</button>
+        <button class="tab-button" onclick="cambiarPestaña('laboral')">LABORAL</button>
+    </div>
+
+    <div id="penal" class="content-container active">
+        <div class="tarjeta-articulo">
+            <div class="texto-ley">
+                <p class="titulo-ley">Código Penal - Artículo 1</p>
+                <p class="cuerpo-ley">Este código se aplicará por delitos cometidos o cuyos efectos deban producirse en el territorio de la Nación Argentina.</p>
+            </div>
+            <button class="btn-audio" onclick="hablar('Código Penal Artículo 1. Este código se aplicará por delitos cometidos o cuyos efectos deban producirse en el territorio de la Nación Argentina.')">🔊</button>
+        </div>
+    </div>
+
+    <div id="civil" class="content-container">
+        <div class="tarjeta-articulo">
+            <div class="texto-ley">
+                <p class="titulo-ley">Código Civil y Com. - Artículo 1</p>
+                <p class="cuerpo-ley">Fuentes y aplicación. Los casos que este Código rige deben ser resueltos según las leyes que resulten aplicables.</p>
+            </div>
+            <button class="btn-audio" onclick="hablar('Código Civil y Comercial Artículo 1. Fuentes y aplicación. Los casos que este Código rige deben ser resueltos según las leyes.')">🔊</button>
+        </div>
+    </div>
+
+    <div id="familia" class="content-container">
+        <div class="tarjeta-articulo">
+            <div class="texto-ley">
+                <p class="titulo-ley">Familia y Menores - Módulo Base</p>
+                <p class="cuerpo-ley">Contenido legal cargado dentro de la sección FAMILIA Y MENORES. Tocá el parlante derecho para validación por audio.</p>
+            </div>
+            <button class="btn-audio" onclick="hablar('Módulo de familia y menores activo.')">🔊</button>
+        </div>
+    </div>
+
+    <div id="consumidor" class="content-container">
+        <div class="tarjeta-articulo">
+            <div class="texto-ley">
+                <p class="titulo-ley">Consumidor - Ley 24.240</p>
+                <p class="cuerpo-ley">Defensa del Consumidor. La presente ley tiene por objeto la defensa del consumidor o usuario.</p>
+            </div>
+            <button class="btn-audio" onclick="hablar('Ley 24.240. Defensa del Consumidor. La presente ley tiene por objeto la defensa del consumidor o usuario.')">🔊</button>
+        </div>
+    </div>
+
+    <div id="laboral" class="content-container">
+        <div class="tarjeta-articulo">
+            <div class="texto-ley">
+                <p class="titulo-ley">Laboral - Ley de Contrato de Trabajo</p>
+                <p class="cuerpo-ley">Artículo 1. Fuentes de regulación. El contrato de trabajo y la relación de trabajo se rigen por esta ley.</p>
+            </div>
+            <button class="btn-audio" onclick="hablar('Ley de Contrato de Trabajo Artículo 1. Fuentes de regulación. El contrato de trabajo y la relación de trabajo se rigen por esta ley.')">🔊</button>
+        </div>
+    </div>
+
+    <script>
+        // Lógica para cambiar de pestaña en la web
+        function cambiarPestaña(idCategoria) {
+            // Desactivar todos los botones y contenidos
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.content-container').forEach(cont => cont.classList.remove('active'));
             
-            for cat in self.categorias_reales:
-                cursor.execute("SELECT fuente, articulo, contenido FROM leyes WHERE categoria LIKE ?", ('%' + cat["key"] + '%',))
-                datos_leyes[cat["key"]] = cursor.fetchall()
-                
-            conexion.close()
-        except Exception as e:
-            print(f"Aviso: No se pudo conectar a la DB ({e}). Usando modo ilustrativo.")
-            # Si falla, dejamos el diccionario vacío para que use los datos de respaldo
-            for cat in self.categorias_reales:
-                datos_leyes[cat["key"]] = []
+            // Activar la pestaña correcta
+            event.currentTarget.classList.add('active');
+            document.getElementById(idCategoria).classList.add('active');
+        }
 
-        # 2. Ahora sí, armamos la interfaz sin tocar el disco
-        for cat in self.categorias_reales:
-            pestaña = TabbedPanelItem(text=cat["titulo"])
-            pestaña.background_normal = ''
-            pestaña.background_color = AZUL_PROFUNDO
-            pestaña.color = CIAN_ESCUDO
-            pestaña.font_size = 13
-            pestaña.font_bold = True
-            
-            scroll = ScrollView(size_hint=(1, 1))
-            contenedor_lista = BoxLayout(orientation='vertical', size_hint_y=None, spacing=12, padding=12)
-            contenedor_lista.bind(minimum_height=contenedor_lista.setter('height'))
-            
-            # Traemos los resultados que ya están en memoria
-            resultados = datos_leyes.get(cat["key"], [])
-            
-            # Respaldo visual si no hay registros en esa categoría
-            if not resultados:
-                resultados = [("Módulo Base", "Artículo Ilustrativo", f"Contenido legal cargado dentro de la sección {cat['titulo']}. Tocá el parlante derecho para validación por audio.")]
-
-            # Inyectamos las tarjetas en el contenedor
-            for fuente, art, contenido in resultados:
-                tarjeta = TarjetaArticulo(
-                    fuente=fuente, articulo=art, contenido=contenido,
-                    callback_audio=self.reproducir_altoparlante
-                )
-                contenedor_lista.add_widget(tarjeta)
-                
-            scroll.add_widget(contenedor_lista)
-            pestaña.add_widget(scroll)
-            self.add_widget(pestaña)
-
-class EscudoLegalApp(App):
-    def build(self):
-        self.title = "Escudo Legal - Módulo Asistencia"
-        return MenuAsistenciaLeyes()
-
-if __name__ == '__main__':
-    EscudoLegalApp().run()
+        // Lógica de Altoparlante nativa para celulares (Sustituye a plyer.tts)
+        function hablar(texto) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Detiene audios anteriores si los hay
+                var utterance = new SpeechSynthesisUtterance(texto);
+                utterance.lang = 'es-AR'; // Español de Argentina
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Tu navegador no soporta salida de audio de voz.");
+            }
+        }
+    </script>
+</body>
+</html>
