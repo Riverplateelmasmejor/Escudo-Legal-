@@ -1,0 +1,127 @@
+# escudo_legal_core.py
+# ARCHIVO CENTRAL - MOTOR DE INTELIGENCIA DE JURIDICCIÓN Y DEFENSA v1.0
+import math
+
+# ==========================================
+# 1. BASE DE DATOS DE CONTENCION JURIDICA
+# ==========================================
+# Expandible a Córdoba, Santa Fe, etc. Solo hay que sumar la clave.
+DB_LEGAL = {
+    "CABA": {
+        "jurisdiccion": "Ciudad Autónoma de Buenos Aires",
+        "constitucion": "Constitución de la CABA (Art. 13 - Libertad personal)",
+        "ley_policial": "Ley N° 5688 - Sistema Integral de Seguridad Pública",
+        "ley_transito": "Ley N° 2148 - Código de Tránsito y Transporte",
+        "articulos_clave": {
+            "identificacion": "Art. 84 (Ley 5688): La policía puede pedir identificación ante sospecha flagrante. Debe hacerse en el lugar, de forma inmediata. ¡No pueden trasladarte a la comisaría solo para averiguar identidad!",
+            "retencion_vehiculo": "Art. 5.4.1 (Ley 2148): Causales de retención de vehículo estrictas (falta de patente, alcoholemia positiva, sin seguro). La grúa no puede llevarse el auto si subsanás la falta en el momento o si estás adentro.",
+            "filmacion": "Garantía General CABA: Es legal filmar el procedimiento de la autoridad pública en la vía pública. Ningún edicto local puede pasar por encima del derecho de contralor ciudadano."
+        },
+        "telefonos_emergencia": ["111 (Derechos Humanos)", "0800-999-2832 (Fiscalías CABA)"]
+    },
+    "PBA": {
+        "jurisdiccion": "Provincia de Buenos Aires",
+        "constitucion": "Constitución de la Prov. de Bs. As. (Art. 15 - Amparo y Libertad)",
+        "ley_policial": "Ley N° 13.482 - Unificación de las Policías de la Provincia",
+        "ley_transito": "Ley N° 13.927 - Código de Tránsito Bonaerense",
+        "articulos_clave": {
+            "identificacion": "Art. 15 (Ley 13.482): Exige indicios vehementes o circunstancias debidamente fundadas de un delito para interceptar. El oficial tiene la OBLIGACIÓN de identificarse primero (nombre y legajo).",
+            "retencion_vehiculo": "Ley 13.927: Retención de licencia por faltas graves (VTV vencida, falta de seguro, alcohol). Exigir siempre el acta labrada con copia en mano.",
+            "filmacion": "Jurisprudencia Nacional: El espacio público es libre. Filmar el accionar policial es una garantía de transparencia respaldada por la Constitución Provincial."
+        },
+        "telefonos_emergencia": ["911 (Policía)", "0800-222-5262 (Ministerio de Seguridad PBA)"]
+    },
+    "FEDERAL_ARG": {
+        "jurisdiccion": "Jurisdicción Federal / Territorio Nacional",
+        "constitucion": "Constitución de la Nación Argentina (Art. 18 - Inviolabilidad de la defensa)",
+        "ley_policial": "Código Procesal Penal de la Nación",
+        "ley_transito": "Ley Nacional de Tránsito N° 24.449",
+        "articulos_clave": {
+            "identificacion": "Art. 230 bis (CPPN): Gendarmería o Policía Federal solo pueden requisar o demorar sin orden judicial si existen 'circunstancias previas que la justifiquen' (estado de sospecha o requisa de frontera).",
+            "retencion_vehiculo": "Art. 72 (Ley 24.449): Retención preventiva solo por peligro manifiesto, falta de frenos, o conductor inhabilitado. El resto son multas, no secuestro directo.",
+            "filmacion": "Art. 1 de la C.N. (Sistema Republicano): Los actos de los funcionarios públicos son públicos. Se puede registrar todo procedimiento sin obstruir el paso."
+        },
+        "telefonos_emergencia": ["134 (Denuncias de Violencia Institucional)", "0800-222-3425 (Defensoría del Pueblo)"]
+    }
+}
+
+# ==========================================
+# 2. MOTOR DE DETECCIÓN GEOGRÁFICA (POLÍGONOS)
+# ==========================================
+def obtener_modulo_por_coordenadas(lat, lon):
+    """
+    Analiza la latitud y longitud. 
+    Apunta fino si es CABA, si es el cinturón de Buenos Aires (PBA), 
+    y si se va de rango cae en el escudo Federal genérico.
+    """
+    # Caja aproximada del mapa de CABA (Delimitada por Gral Paz y el Río)
+    if (-34.705 <= lat <= -34.525) and (-58.531 <= lon <= -58.335):
+        return "CABA"
+    
+    # Caja extendida de la Provincia de Buenos Aires
+    elif (-41.000 <= lat <= -33.000) and (-63.000 <= lon <= -56.500):
+        return "PBA"
+    
+    # Si viaja a otra provincia o falla el GPS, se activa el Escudo Federal Nacional
+    return "FEDERAL_ARG"
+
+# ==========================================
+# 3. ACCIONES DEL BOTÓN DE PÁNICO / ESCUDO
+# ==========================================
+class EscudoLegalAsistente:
+    def __init__(self):
+        self.lat_actual = 0.0
+        self.lon_actual = 0.0
+        self.jurisdiccion_activa = "FEDERAL_ARG"
+
+    def actualizar_ubicacion(self, lat, lon):
+        self.lat_actual = lat
+        self.lon_actual = lon
+        self.jurisdiccion_activa = obtener_modulo_por_coordenadas(lat, lon)
+
+    def disparar_alerta_rapida(self, tipo_control):
+        """
+        Devuelve el botiquín legal de emergencia para escupir en pantalla 
+        o mandar por texto según la situación.
+        tipo_control puede ser: 'identificacion', 'retencion_vehiculo', 'filmacion'
+        """
+        datos = DB_LEGAL[self.jurisdiccion_activa]
+        
+        informe = []
+        informe.append(f"🚨 ALERTA LEGAL DISPARADA 🚨")
+        informe.append(f"📍 Zona: {datos['jurisdiccion']}")
+        informe.append(f"🛡️ Amparo: {datos['constitucion']}")
+        informe.append(f"📝 Ley de Control: {datos['ley_policial'] if tipo_control != 'retencion_vehiculo' else datos['ley_transito']}")
+        informe.append(f"\n🔥 LEY DEFENSA EN VIVO:")
+        informe.append(datos['articulos_clave'].get(tipo_control, "Procedimiento no mapeado. Exigir orden judicial escrita."))
+        informe.append(f"\n📞 CONTACTOS DE DENUNCIA INMEDIATA:")
+        for tel in datos['telefonos_emergencia']:
+            informe.append(f" - {tel}")
+            
+        return "\n".join(informe)
+
+# ==========================================
+# 4. TESTING DE ACCIONES (Para correr en consola)
+# ==========================================
+if __name__ == "__main__":
+    asistente = EscudoLegalAsistente()
+    
+    print("====== SCRIPT CORRIENDO: PROBANDO INYECCIÓN DE DATOS ======\n")
+    
+    # SIMULACIÓN 1: El usuario va manejando y lo frenan en San Justo / La Matanza (PBA)
+    print("--- [SIMULACIÓN 1: CONTROL VEHICULAR EN PROVINCIA] ---")
+    asistente.actualizar_ubicacion(-34.6732, -58.5634) # Coordenadas PBA
+    print(asistente.disparar_alerta_rapida("retencion_vehiculo"))
+    print("\n" + "="*50 + "\n")
+    
+    # SIMULACIÓN 2: Gendarmería le frena el paso peatonal en Retiro (CABA)
+    print("--- [SIMULACIÓN 2: PEDIDO DE DNI EN CABA] ---")
+    asistente.actualizar_ubicacion(-34.5912, -58.3742) # Coordenadas CABA
+    print(asistente.disparar_alerta_rapida("identificacion"))
+    print("\n" + "="*50 + "\n")
+    
+    # SIMULACIÓN 3: El tipo está viajando por el interior del país
+    print("--- [SIMULACIÓN 3: PROCEDIMIENTO EN RUTA NACIONAL] ---")
+    asistente.actualizar_ubicacion(-31.4201, -64.1888) # Coordenadas Córdoba (Cae en Federal por ahora)
+    print(asistente.disparar_alerta_rapida("filmacion"))
+
