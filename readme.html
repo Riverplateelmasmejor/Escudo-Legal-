@@ -1,0 +1,105 @@
+import os
+import sys
+
+# Base de datos completa y definitiva de Escudo Real
+protocolos = {
+    "1": {
+        "titulo": "🚗 CONTROL VEHICULAR",
+        "pasos": [
+            "Mantén las manos visibles sobre el volante y enciende la luz interna si es de noche.",
+            "Documentación obligatoria: DNI, Licencia de Conducir vigente, Cédula (Verde o Azul), Comprobante de Seguro y VTV/RTO.",
+            "El oficial NO puede retener tu documentación ni tu vehículo a menos que falte el seguro, la licencia esté vencida o des positivo en alcoholemia.",
+            "Falta de matafuegos o balizas es infracción, pero NO es motivo de secuestro del auto."
+        ],
+        "denuncia": "Línea 134 (Denuncias del Ministerio de Seguridad) o Fiscalía de turno si hay extorsión."
+    },
+    "2": {
+        "titulo": "🚨 DETENCIÓN POLICIAL / ARRESTO",
+        "pasos": [
+            "Pregunta inmediatamente el motivo de la detención y la fuerza/comisaría a la que te llevan.",
+            "Tienes derecho a guardar silencio. No declares ni firmes nada sin la presencia de un abogado.",
+            "Exige hacer una llamada telefónica inmediata a un familiar o persona de confianza para avisar dónde estás.",
+            "Debes ser revisado por un médico legista para constatar tu estado físico al ingresar a la dependencia."
+        ],
+        "denuncia": "Línea 0800-122-5878 (Secretaría de Derechos Humanos de la Nación)."
+    },
+    "3": {
+        "titulo": "🪪 CONTROL DE IDENTIDAD",
+        "pasos": [
+            "Muestra tu DNI físico o desde la app Mi Argentina. No te lo pueden retener de forma permanente.",
+            "La policía solo puede demorarte para averiguar identidad si hay sospecha fundada de un delito.",
+            "El límite legal máximo para la averiguación de identidad suele ser de entre 6 y 12 horas según la provincia.",
+            "Anota o memoriza el apellido, número de legajo del oficial y el número del patrullero."
+        ],
+        "denuncia": "Línea 134 o ante la Defensoría del Pueblo local."
+    },
+    "4": {
+        "titulo": "🏠 INGRESO AL DOMICILIO (ALLANAMIENTO)",
+        "pasos": [
+            "No dejes entrar a nadie sin que antes te muestren la Orden de Allanamiento por escrito.",
+            "Verifica que la orden tenga la firma original del Juez, la fecha del día y tu dirección exacta.",
+            "El operativo debe realizarse obligatoriamente en presencia de al menos dos testigos (pueden ser vecinos).",
+            "Tienes derecho a exigir una copia del acta final donde conste todo lo que secuestraron."
+        ],
+        "denuncia": "Línea 0800-33-FISCAL (Si estás en CABA) o la Fiscalía Penal de tu jurisdicción."
+    },
+    "5": {
+        "titulo": "⚠️ ABUSO DE AUTORIDAD Y VIOLENCIA INSTITUCIONAL",
+        "pasos": [
+            "Mantén la calma absoluta. No te resistas físicamente ni agredas verbalmente al funcionario.",
+            "Graba video, audio o toma fotografías del procedimiento si consideras que es seguro hacerlo.",
+            "Busca datos de contacto de personas que estén presenciando la situación para usarlos como testigos.",
+            "Si sufriste agresiones físicas, dirígete a un hospital público para que certifiquen las lesiones de inmediato."
+        ],
+        "denuncia": "Línea Nacional: 0800-122-5878 | WhatsApp: +54 11-4091-7352 (Centro de Denuncias de Violencia Institucional)."
+    }
+}
+
+def limpiar_pantalla():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def menu_principal():
+    while True:
+        limpiar_pantalla()
+        print("==================================================")
+        print("           🛡️  ESCUDO REAL v1.0 (Python)          ")
+        print("==================================================")
+        print(" Selecciona el procedimiento que enfrentas:\n")
+        print(" [1] Control Vehicular")
+        print(" [2] Detención Policial")
+        print(" [3] Control de Identidad")
+        print(" [4] Ingreso al Domicilio")
+        print(" [5] Abuso de Autoridad")
+        print(" [0] Salir de la aplicación")
+        print("==================================================")
+        
+        opcion = input("\nIngresa el número de tu opción: ").strip()
+        
+        if opcion == "0":
+            print("\nCerrando Escudo Real. Mantente a salvo.")
+            sys.exit()
+        elif opcion in protocolos:
+            mostrar_protocolo(opcion)
+        else:
+            input("\n❌ Opción inválida. Presiona ENTER para intentar de nuevo...")
+
+def mostrar_protocolo(id_opcion):
+    info = protocolos[id_opcion]
+    limpiar_pantalla()
+    print("==================================================")
+    print(f" {info['titulo']} ")
+    print("==================================================")
+    print("\nPROCESO Y DERECHOS INMEDIATOS:")
+    for paso in info['pasos']:
+        print(f" 🔹 {paso}\n")
+        
+    print("--------------------------------------------------")
+    print(" 🚨 CANAL OFICIAL DE DENUNCIA:")
+    print(f" {info['denuncia']}")
+    print("==================================================")
+    
+    input("\n⬅️ Presiona ENTER para regresar al menú principal...")
+
+if __name__ == "__main__":
+    menu_principal()
+    
