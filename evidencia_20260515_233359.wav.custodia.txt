@@ -1,0 +1,7 @@
+=== ACTA DE CADENA DE CUSTODIA DIGITAL ===
+Aplicación: Escudo Legal
+Fecha y Hora de Creación: 2026-05-15 23:33:59
+Archivo de Evidencia: evidencia_20260515_233359.wav
+Huella Digital Inviolable (SHA-256):
+21421f9d9371af18f61692082489ab32dd2802470b1b8f17a1c5bb09edb28e78
+=========================================
