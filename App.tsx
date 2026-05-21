@@ -1,146 +1,54 @@
-import { useEffect, useState, type ComponentType } from "react";
-
-import { modules as discoveredModules } from "./.generated/mockup-components";
-
-type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
-
-function _resolveComponent(
-  mod: Record<string, unknown>,
-  name: string,
-): ComponentType | undefined {
-  const fns = Object.values(mod).filter(
-    (v) => typeof v === "function",
-  ) as ComponentType[];
-  return (
-    (mod.default as ComponentType) ||
-    (mod.Preview as ComponentType) ||
-    (mod[name] as ComponentType) ||
-    fns[fns.length - 1]
-  );
-}
-
-function PreviewRenderer({
-  componentPath,
-  modules,
-}: {
-  componentPath: string;
-  modules: ModuleMap;
-}) {
-  const [Component, setComponent] = useState<ComponentType | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    setComponent(null);
-    setError(null);
-
-    async function loadComponent(): Promise<void> {
-      const key = `./components/mockups/${componentPath}.tsx`;
-      const loader = modules[key];
-      if (!loader) {
-        setError(`No component found at ${componentPath}.tsx`);
-        return;
-      }
-
-      try {
-        const mod = await loader();
-        if (cancelled) {
-          return;
-        }
-        const name = componentPath.split("/").pop()!;
-        const comp = _resolveComponent(mod, name);
-        if (!comp) {
-          setError(
-            `No exported React component found in ${componentPath}.tsx\n\nMake sure the file has at least one exported function component.`,
-          );
-          return;
-        }
-        setComponent(() => comp);
-      } catch (e) {
-        if (cancelled) {
-          return;
-        }
-
-        const message = e instanceof Error ? e.message : String(e);
-        setError(`Failed to load preview.\n${message}`);
-      }
+// Base de datos de protocolos de emergencia
+const protocolos = {
+    control_vehicular: {
+        titulo: "🚗 Control Vehicular",
+        pasos: ["Mantén las manos sobre el volante.", "Apaga el motor y enciende la luz interna si es de noche.", "Presenta Licencia, Cédula y Seguro obligatorio."],
+        denuncia: "Línea 134 (Fuerzas Federales) o Fiscalía Local."
+    },
+    detencion_policial: {
+        titulo: "🚨 Detención Policial",
+        pasos: ["Pregunta inmediatamente el motivo de la detención.", "Tienes derecho a guardar silencio hasta hablar con un abogado.", "Exige hacer una llamada telefónica a un familiar."],
+        denuncia: "Línea 0800-122-5878 (Secretaría de DD.HH.)"
+    },
+    control_identidad: {
+        titulo: "🪪 Control de Identidad",
+        pasos: ["Exhibe tu DNI. No pueden retenértelo sin causa.", "La demora para acreditar identidad tiene un límite de horas legal.", "Anota el nombre y legajo del oficial que te lo solicita."],
+        denuncia: "Línea 134 o Ministerio de Seguridad."
+    },
+    ingreso_domicilio: {
+        titulo: "🏠 Ingreso al Domicilio",
+        pasos: ["Exige ver la orden de allanamiento escrita y firmada por un juez.", "Verifica que la dirección en el papel sea exactamente la tuya.", "Busca testigos (vecinos) para que presencien el operativo."],
+        denuncia: "Línea 0800-33-FISCAL (Si es en CABA) o emergencias ante falsos oficiales."
+    },
+    abuso_autoridad: {
+        titulo: "⚠️ Abuso de Autoridad",
+        pasos: ["Mantén la calma y no te resistas físicamente.", "Graba video o audio si es seguro hacerlo.", "Identifica número de patrullero, chaleco o placa."],
+        denuncia: "Línea Nacional: 0800-122-5878 | WhatsApp: +54 11-4091-7352"
     }
+};
 
-    void loadComponent();
+function seleccionarEscenario(id) {
+    const info = protocolos[id];
+    const contenedorMenu = document.querySelector('.menu-botones');
+    const pantallaInfo = document.getElementById('pantalla-informacion');
+    const contenido = document.getElementById('contenido-legal');
 
-    return () => {
-      cancelled = true;
-    };
-  }, [componentPath, modules]);
+    // Ocultar menú y mostrar pantalla de información
+    contenedorMenu.style.display = 'none';
+    pantallaInfo.classList.remove('hidden');
 
-  if (error) {
-    return (
-      <pre style={{ color: "red", padding: "2rem", fontFamily: "system-ui" }}>
-        {error}
-      </pre>
-    );
-  }
-
-  if (!Component) return null;
-
-  return <Component />;
+    // Insertar contenido dinámico sin errores de formato
+    contenido.innerHTML = `
+        <h2>${info.titulo}</h2>
+        <h3>Pasos inmediatos:</h3>
+        <ul>${info.pasos.map(paso => `<li>${paso}</li>`).join('')}</ul>
+        <div class="alerta-denuncia">
+            <strong>Canal de Denuncia:</strong><br>${info.denuncia}
+        </div>
+    `;
 }
 
-function getBasePath(): string {
-  return import.meta.env.BASE_URL.replace(/\/$/, "");
+function volverAlMenu() {
+    document.querySelector('.menu-botones').style.display = 'flex';
+    document.getElementById('pantalla-informacion').classList.add('hidden');
 }
-
-function getPreviewExamplePath(): string {
-  const basePath = getBasePath();
-  return `${basePath}/preview/ComponentName`;
-}
-
-function Gallery() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-      <div className="text-center max-w-md">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-3">
-          Component Preview Server
-        </h1>
-        <p className="text-gray-500 mb-4">
-          This server renders individual components for the workspace canvas.
-        </p>
-        <p className="text-sm text-gray-400">
-          Access component previews at{" "}
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-            {getPreviewExamplePath()}
-          </code>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function getPreviewPath(): string | null {
-  const basePath = getBasePath();
-  const { pathname } = window.location;
-  const local =
-    basePath && pathname.startsWith(basePath)
-      ? pathname.slice(basePath.length) || "/"
-      : pathname;
-  const match = local.match(/^\/preview\/(.+)$/);
-  return match ? match[1] : null;
-}
-
-function App() {
-  const previewPath = getPreviewPath();
-
-  if (previewPath) {
-    return (
-      <PreviewRenderer
-        componentPath={previewPath}
-        modules={discoveredModules}
-      />
-    );
-  }
-
-  return <Gallery />;
-}
-
-export default App;
